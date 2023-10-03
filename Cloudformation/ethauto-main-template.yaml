@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ethauto main CloudFormation Stack
+
+Resources:
+  CFStackClusterPRODethauto:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3bucket-cloudformationstack-prod-ethauto.s3.ap-northeast-2.amazonaws.com/cluster-stack.yaml
+    Metadata:
+      Tags:
+        - Key: project
+          Value: ethauto
+
+  CFStackServerlessPRODethauto:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3bucket-cloudformationstack-prod-ethauto.s3.ap-northeast-2.amazonaws.com/serverless-stack.yaml
+    Metadata:
+      Tags:
+        - Key: project
+          Value: ethauto

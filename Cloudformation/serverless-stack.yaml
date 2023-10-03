@@ -1,0 +1,180 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: project-ethauto serverless resource stack
+
+Resources:
+  ECRForK3sPod: #ECR - K3S POD
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: ecr-k3spod-prod-ethauto
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  ECRForLambdaBestK: #ECR - Lambda BestK
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: ecr-lambdabestk-prod-ethauto
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  ECRForLambdaEndPrice: #ECR - Lambda Endprice
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: ecr-lambdaendprice-prod-ethauto
+      ImageScanningConfiguration:
+        ScanOnPush: false
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  DynamoDBTable: #DynamoDB Table
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Table-ForEthauto-PROD-ethauto
+      AttributeDefinitions:
+        - AttributeName: env
+          AttributeType: S
+      KeySchema:
+        - AttributeName: env
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      BillingMode: PROVISIONED
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+  
+  LambdaFunctionBestK: #Lambda function - best K
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Lambda-Bestk-PROD-ethauto
+      Code:
+        ImageUri: 553149402753.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-lambdabestk-prod-ethauto:prototype.latest
+      PackageType: Image
+      Role: arn:aws:iam::553149402753:role/IAMRole-forLambda-PROD-ethauto
+      MemorySize: 512
+      Timeout: 30
+      TracingConfig:
+        Mode: PassThrough
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  LambdaFunctionEndprice: #Lambda function - endprice
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Lambda-Endprice-PROD-ethauto
+      Code:
+        ImageUri: 553149402753.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-lambdaendprice-prod-ethauto:prototype.latest
+      PackageType: Image
+      Role: arn:aws:iam::553149402753:role/IAMRole-forLambda-PROD-ethauto
+      MemorySize: 4096
+      Timeout: 60
+      TracingConfig:
+        Mode: PassThrough
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  SchedulerExecutionRole: #IAM 역할 - EventBridge Schedule 실행 역할
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: IAMRole-forSchedulerExecution-PROD-ethauto
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - scheduler.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      #ManagedPolicyArns:
+        #- CustomerManagedPolicyForScheduler.Arn
+      Policies:
+        - PolicyName: Policy-AllowLambdaInvokeFunctionSQSSendMessage-PROD-ethauto
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt LambdaFunctionBestK.Arn
+                  - !GetAtt LambdaFunctionEndprice.Arn
+              - Effect: Allow
+                Action:
+                  - sqs:SendMessage
+                Resource:
+                  - arn:aws:sqs:ap-northeast-2:553149402753:SQS-DLQforEVSchedule-PROD-ethauto
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+
+
+  ScheduleGroup: #EvnetBridge Schedule Group
+    Type: AWS::Scheduler::ScheduleGroup
+    Properties: 
+      Name: ScheduleGroup-forLambdaInvoke-PROD-ethauto
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+
+  SchedulerForBestKLambda: #EventBridge Schedule invoke lambda-bestk
+    Type: AWS::Scheduler::Schedule
+    Properties: 
+      GroupName: !Ref ScheduleGroup
+      Name: Schedule-forLambdaBestK-PROD-ethauto
+      ScheduleExpression: "cron(55 0,4,8,12,16,20 ? * * *)"
+      FlexibleTimeWindow: 
+        Mode: 'OFF'
+      ScheduleExpressionTimezone: Asia/Seoul
+      State: ENABLED
+      Target:
+        Arn: !GetAtt LambdaFunctionBestK.Arn
+        RoleArn: !GetAtt SchedulerExecutionRole.Arn
+        RetryPolicy: 
+          MaximumEventAgeInSeconds: 300
+          MaximumRetryAttempts: 3
+        Input: '{"Payload": "", "InvocationType": "Event"}'
+
+  SchedulerForEndpriceLambda: #EventBridge Schedule invoke lambda-endprice
+    Type: AWS::Scheduler::Schedule
+    Properties: 
+      GroupName: !Ref ScheduleGroup
+      Name: Schedule-forLambdaEndprice-PROD-ethauto
+      ScheduleExpression: "cron(55 0,4,8,12,16,20 ? * * *)"
+      FlexibleTimeWindow: 
+        Mode: 'OFF'
+      ScheduleExpressionTimezone: Asia/Seoul
+      State: ENABLED
+      Target:
+        Arn: !GetAtt LambdaFunctionEndprice.Arn
+        RoleArn: !GetAtt SchedulerExecutionRole.Arn
+        RetryPolicy: 
+          MaximumEventAgeInSeconds: 300
+          MaximumRetryAttempts: 3
+        Input: '{"Payload": "", "InvocationType": "Event"}'

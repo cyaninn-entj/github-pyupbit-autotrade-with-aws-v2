@@ -1,0 +1,4 @@
+pyupbit
+boto3
+schedule
+slack_sdk

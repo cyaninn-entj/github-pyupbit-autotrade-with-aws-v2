@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-ethauto
+  namespace: prod-ethauto
+spec:
+  schedule: "0 0 * * *"
+  #schedule: "25 4 * * *" #tmp cronjob
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 86100
+      #activeDeadlineSeconds: 70200 #tmp cronjob
+      template:
+        metadata:
+          labels:
+            app: job-ethauto
+            namespace: prod-ethauto
+        spec:
+          volumes:
+          - name: task-pv-storage
+            persistentVolumeClaim:
+              claimName: pv-claim-ethauto
+          containers:
+          - name: python-app-ethauto
+            image: 553149402753.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-k3spod-prod-ethauto
+            volumeMounts:
+            - mountPath: "/home/output"
+              name: task-pv-storage
+            env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credential
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credential
+                  key: aws-secret-access-key
+            - name: AWS_DEFAULT_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws-credential
+                  key: aws-default-region
+            command: ["sh", "/home/run.sh"]
+          imagePullSecrets:
+          - name: regcred
+          restartPolicy: OnFailure

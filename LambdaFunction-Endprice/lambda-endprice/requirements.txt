@@ -1,0 +1,7 @@
+pyupbit
+prophet
+aws-xray-sdk==2.4.2
+botocore==1.20.55
+Django==1.11.3
+slack_sdk
+plotly==5.11.0

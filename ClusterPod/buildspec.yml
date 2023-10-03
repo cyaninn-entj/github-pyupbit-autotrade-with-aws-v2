@@ -1,0 +1,44 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: ap-northeast-2
+    AWS_ACCOUNT_ID: 553149402753
+    IMAGE_REPO_NAME: ecr-k3spod-prod-ethauto
+    IMAGE_TAG: v.1.1.5   #have to modify image version in kustomization.yaml after modify this line
+  parameter-store:
+    github_ssh_key: "/ethauto/github-ssh-private-key"
+
+phases:
+  install:
+    commands:
+      - apt update && apt-get update
+  pre_build:
+    commands:
+      - echo $AWS_DEFAULT_REGION
+      - echo $AWS_ACCOUNT_ID
+      - echo $IMAGE_REPO_NAME
+      - echo $IMAGE_TAG
+      - mkdir -p ~/.ssh
+      - echo "$github_ssh_key" > ~/.ssh/id_rsa
+      - chmod 600 ~/.ssh/id_rsa
+      - ssh-keygen -F github.com || ssh-keyscan github.com >>~/.ssh/known_hosts
+      - git config --global user.email "sounddevice3@gmail.com"
+      - git config --global user.name "cyaninn-entj"
+  build:
+    commands:
+      - cd pod_container_image
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - cd ..
+      #- echo skip build section
+  post_build:
+    commands:
+      - git clone git@github.com:cyaninn-entj/github-Kustomization-PROD-ethauto.git
+      - cp -r manifests/* github-Kustomization-PROD-ethauto/
+      - cd github-Kustomization-PROD-ethauto
+      - git add .
+      - git commit -m "commit from codebuild:$CODEBUILD_BUILD_NUMBER"
+      - git push

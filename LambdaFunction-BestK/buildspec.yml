@@ -1,0 +1,34 @@
+version: 0.2
+# buildspec.yaml for lambda best k
+
+env:
+  variables:
+    AWS_DEFAULT_REGION: ap-northeast-2
+    AWS_ACCOUNT_ID: 553149402753
+    IMAGE_REPO_NAME: ecr-lambdabestk-prod-ethauto
+    IMAGE_TAG: v.1.1.8 # have to check version before commit
+    LAMBDA_NAME: Lambda-Bestk-PROD-ethauto
+
+phases:
+  install:
+    commands:
+      - apt update && apt-get update
+  pre_build:
+    commands:
+      - echo $AWS_DEFAULT_REGION
+      - echo $AWS_ACCOUNT_ID
+      - echo $IMAGE_REPO_NAME
+      - echo $IMAGE_TAG
+      - echo $LAMBDA_NAME
+  build:
+    commands:
+      - cd lambda-bestK
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - cd ..
+      #- echo skip build section
+  post_build:
+    commands:
+      - aws lambda update-function-code --function-name $LAMBDA_NAME --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG --publish
