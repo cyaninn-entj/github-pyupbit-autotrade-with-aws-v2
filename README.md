@@ -8,9 +8,7 @@
 
 ### 프로젝트 개요
 
-<p align="center">
-  <img src="![1-architecture drawio (1)](https://github.com/cyaninn-entj/github-pyupbit-autotrade-with-aws-v2/assets/83701837/57811db6-f644-4243-89e5-0db43dab13e4)">
-</p>
+![1-architecture drawio (1)](https://github.com/cyaninn-entj/github-pyupbit-autotrade-with-aws-v2/assets/83701837/57811db6-f644-4243-89e5-0db43dab13e4)
 
 - CNCF sandbox project인 k3s cluster 로 컨테이너 관리
 
