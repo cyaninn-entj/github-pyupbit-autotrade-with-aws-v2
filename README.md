@@ -1,5 +1,5 @@
 # 조코딩 채널 프로젝트 + AWS + K3S + ArgoCD
-## 유튜버 '조코딩' 의 비트코인 자동매매 Open Source Project에 CNCF project 적용해보기
+## 유튜버 '조코딩' 의 비트코인 자동매매 Project에 CNCF project 적용해보기
 
 ### 프로젝트 블로그
 - <https://yeonwoo97.tistory.com/503>
