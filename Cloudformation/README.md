@@ -1,4 +1,4 @@
-# CloudFOrmation
+# CloudFormation
 
 ### 프로젝트 블로그
 - <https://yeonwoo97.tistory.com/503>
