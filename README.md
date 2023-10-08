@@ -7,8 +7,11 @@
 - 패치노트, 설계, 구축, 관리 문서 포스팅
 
 ### 프로젝트 개요
-
+- architecture diagram
 ![1-architecture drawio (1)](https://github.com/cyaninn-entj/github-pyupbit-autotrade-with-aws-v2/assets/83701837/57811db6-f644-4243-89e5-0db43dab13e4)
+
+- proccess diagram
+![process-general](https://github.com/cyaninn-entj/github-pyupbit-autotrade-with-aws-v2/assets/83701837/3e0207fc-55e6-4b03-9a5d-e45850524703)
 
 - CNCF sandbox project인 k3s cluster 로 컨테이너 관리
 
