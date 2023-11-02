@@ -22,3 +22,24 @@ Resources:
             VolumeSize: 16
             VolumeType: gp2
             DeleteOnTermination: true
+
+  EC2K3sClusterWorkerNode01PRODethauto:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: 'ami-0c9c942bd7bf113a2'
+      InstanceType: 't3a.small'
+      KeyName: 'Keypair-ForAllDev-DEV'
+      SecurityGroupIds:
+        - sg-0d9004d2fda0be527
+      SubnetId: 'subnet-04a896c9b286324a0'
+      Tags:
+        - Key: 'project'
+          Value: 'ethauto'
+        - Key: 'ENV'
+          Value: 'PROD'
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: 8
+            VolumeType: gp2
+            DeleteOnTermination: true
