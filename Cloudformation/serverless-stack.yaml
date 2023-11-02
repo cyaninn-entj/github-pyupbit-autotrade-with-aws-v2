@@ -148,7 +148,7 @@ Resources:
     Properties: 
       GroupName: !Ref ScheduleGroup
       Name: Schedule-forLambdaBestK-PROD-ethauto
-      ScheduleExpression: "cron(55 0,4,8,12,16,20 ? * * *)"
+      ScheduleExpression: "cron(50 8 ? * * *)"
       FlexibleTimeWindow: 
         Mode: 'OFF'
       ScheduleExpressionTimezone: Asia/Seoul
@@ -166,7 +166,7 @@ Resources:
     Properties: 
       GroupName: !Ref ScheduleGroup
       Name: Schedule-forLambdaEndprice-PROD-ethauto
-      ScheduleExpression: "cron(55 0,4,8,12,16,20 ? * * *)"
+      ScheduleExpression: "cron(40 * ? * * *)"
       FlexibleTimeWindow: 
         Mode: 'OFF'
       ScheduleExpressionTimezone: Asia/Seoul
