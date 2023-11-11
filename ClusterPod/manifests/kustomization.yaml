@@ -3,4 +3,4 @@ resources:
   - pod-cronjob.yaml
 images:
   - name: 553149402753.dkr.ecr.ap-northeast-2.amazonaws.com/ecr-k3spod-prod-ethauto
-    newTag: v.1.1.5
+    newTag: v.1.2.5 # have to modify this when deploying new version

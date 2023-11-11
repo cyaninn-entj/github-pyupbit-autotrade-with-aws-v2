@@ -19,10 +19,11 @@ def open_logger(log_file_path):
 
     return logger
 
-def send_logs_to_s3(file_path):
+def send_logs_to_s3(file_name,file_path):
     client = boto3.client('s3')
     response = client.put_object(
         Bucket='s3bucket-clusterlog-prod-ethauto',
-        Key=file_path
+        Key=file_name,
+        Body=open(file_path, 'rb')
     )
     return response

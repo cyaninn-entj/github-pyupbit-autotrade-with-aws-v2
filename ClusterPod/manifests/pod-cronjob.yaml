@@ -46,3 +46,5 @@ spec:
           imagePullSecrets:
           - name: regcred
           restartPolicy: OnFailure
+          nodeSelector:
+            node: master01

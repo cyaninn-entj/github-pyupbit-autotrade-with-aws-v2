@@ -5,7 +5,7 @@ env:
     AWS_DEFAULT_REGION: ap-northeast-2
     AWS_ACCOUNT_ID: 553149402753
     IMAGE_REPO_NAME: ecr-k3spod-prod-ethauto
-    IMAGE_TAG: v.1.1.5   #have to modify image version in kustomization.yaml after modify this line
+    IMAGE_TAG: v.1.2.5   #have to modify image version in kustomization.yaml after modify this line
   parameter-store:
     github_ssh_key: "/ethauto/github-ssh-private-key"
 
