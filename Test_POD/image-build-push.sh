@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 버전 변수 설정
-VERSION="ethauto.v.1.1"
+VERSION="ethauto.v.1.3"
 
 # 이미지 태그에 버전 변수를 사용하여 Docker 이미지 빌드
 docker build -t test-image:$VERSION .

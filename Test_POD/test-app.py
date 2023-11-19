@@ -63,15 +63,13 @@ def test_read_dynamoDB():
 def test_pyupbit_api():
     try:
         coin = "KRW-ETH"
-        upbit_access_key, upbit_secret_key, _ = get_parameter_fromSSM()
-        upbit_login = pyupbit.Upbit(upbit_access_key, upbit_secret_key)
+        upbit_access_key, upbit_secret_key, slack_token = get_parameter_fromSSM()
 
         target_price = m_upbit.get_target_price(coin, 0.5)  # Replace 0.5 with your desired 'k' value
         current_price = m_upbit.get_current_price(coin)
-        balance = m_upbit.get_balance("KRW", upbit_login)
 
         message = f"Success: pyupbit API tests\n"
-        message += f"Target Price(k=0.5): {target_price}\nCurrent Price: {current_price}\nBalance: {balance} KRW\n"
+        message += f"Target Price(k=0.5): {target_price}\nCurrent Price: {current_price}\n"
 
         send_slack_message("#test", message)
     except Exception as e:
